@@ -1,0 +1,149 @@
+### Lighthouse
+---
+
+# PKI defines the location of credentials for this node
+pki:
+  ca: |
+    -----BEGIN NEBULA CERTIFICATE-----
+    CkMKEXNwLW5lYnVsYS1uZXR3b3JrKPbIjbUGMPavksQGOiAszmGfN2xMq7abIpgu
+    0oQFmFhFdF3cZ3LkdlmhVBaym0ABEkD0EI7kHrjMysjI0Rgn7EE0Nk0KyZiVC+pX
+    r3q7xmLrXupoWoum0ZJXbHTuzgCT2uqvFreDsrYZWSOuuzX1x9QG
+    -----END NEBULA CERTIFICATE-----
+  cert: |
+    -----BEGIN NEBULA CERTIFICATE-----
+    CmkKBXdyay0yEgn+g6hQgPj//w8iBXVzZXJzKIDqnbUGMPWvksQGOiBVqfGsGPI+
+    OByhiA6TNI+ftVQlHlPhQGlTk8h92MeDCUogaAyTUum0fYIDlZ9AhwQ8EbWfuV/H
+    u/pwSZxPNz77ExoSQIOq4grZ0hjq5Sm+UOUhhOqrA7Wth0S8zlUjVsfFvPE7LMOJ
+    aW07ioUEx2nLykOQJFV+slXPKtbhVPV8PCVW8AI=
+    -----END NEBULA CERTIFICATE-----
+  key: |
+    -----BEGIN NEBULA X25519 PRIVATE KEY-----
+    BLY7ES3vX31eDgemCPwrAB2YiRq3U5EpVYmWnva/hww=
+    -----END NEBULA X25519 PRIVATE KEY-----
+
+# Lighthouse setting
+lighthouse:
+    am_lighthouse: true
+    serve_dns: true
+    dns:
+        host: "[::]"
+        port: 53
+    interval: 60
+
+# Static host map defines hosts with fixed IP addresses on the internet (or any network)
+static_host_map:
+    "192.168.100.1": ["Lighthouse-IP-1:4242"]
+    "192.168.100.2": ["Lighthouse-IP-2:4242"]
+
+# Remote_allow_list controls IP ranges for handshaking with other nodes
+remote_allow_list:
+    "192.168.100.0/24": true
+
+# Listening port configuration
+listen:
+    # To listen on both IPv4 and IPv6 use "::"
+    host: "[::]"
+    port: 4242
+    batch: 64
+    read_buffer: 20971520
+    write_buffer: 20971520
+
+# Continues to punch inbound/outbound at a regular interval to avoid expiration of firewall NAT mappings
+punchy:
+    punch: true
+    punch_back: true
+    respond: true
+    delay: 1s
+    respond_delay: 5s
+
+# List of relay nodes to forward traffic
+relay:
+    relays:
+        - 192.168.100.1       # List of relay IPs to route traffic through
+        - 192.168.100.2       # Add additional relay IPs as needed
+    am_relay: true            # Indicates this node is a relay
+    use_relays: true          # Enables relays for routing traffic
+
+# Configure the private interface. Note: address is baked into the Nebula certificate
+tun:
+    # Disables tun for lighthouse without local interface (rootless)
+    disabled: false
+    # Device name; default chosen by OS if not set
+    dev: nebula1
+    # Toggles forwarding of local broadcast packets (address depends on pki.cert)
+    drop_local_broadcast: false
+    # Toggles forwarding of multicast packets
+    drop_multicast: false
+    # Sets the transmit queue length; default is 500
+    tx_queue: 500
+    # Default MTU; safe setting is 1300 for internet traffic
+    mtu: 1300
+
+# Configure logging level
+logging:
+    # Log level: panic, fatal, error, warning, info, or debug. Default is info
+    level: info
+    # Log format: json or text. Default is text
+    format: json
+    # Disable timestamp logging (useful if another system adds timestamps). Default is false
+    #disable_timestamp: true
+    # Timestamp format using Go time format (RFC3339 by default)
+    # For JSON format: "2006-01-02T15:04:05Z07:00"
+    # For text format: seconds or RFC3339 based on TTY attachment
+    # Example for RFC3339 with millisecond precision:
+    #timestamp_format: "2006-01-02T15:04:05.000Z07:00"
+
+# Specifies the type of metrics exporter
+stats:
+    type: prometheus          # Use Prometheus for metrics collection
+    # Address and port where Prometheus metrics are exposed
+    listen: 127.0.0.1:8080    # Bind to localhost on port 8080
+    # Path where metrics can be accessed
+    path: /metrics            # URL path for metrics endpoint
+    # Namespace for metrics to avoid name collisions
+    namespace: prometheusns   # Custom namespace for metrics
+    # Subsystem for grouping related metrics
+    subsystem: nebula         # Subsystem name for metrics
+    # Interval for metric collection
+    interval: 10s             # Collect metrics every 10 seconds
+    # Include metrics related to messages
+    message_metrics: true     # Enable message-related metrics
+    # Include metrics related to the lighthouse service
+    lighthouse_metrics: true  # Enable lighthouse-related metrics
+
+# Nebula security group configuration
+firewall:
+    # Action for packets not allowed by firewall rules
+    # `drop` (default): silently drop the packet
+    # `reject`: send a reject reply
+    outbound_action: drop
+    inbound_action: drop
+
+    conntrack:
+        tcp_timeout: 12m
+        udp_timeout: 3m
+        default_timeout: 10m
+
+    outbound:
+        # Allow all outbound traffic
+        - port: any
+          proto: any
+          host: any
+
+    inbound:
+        # Allow ICMP between any Nebula hosts
+        - port: any
+          proto: icmp
+          host: any
+
+        # Allow UDP port 53 from any group
+        - port: 53
+          proto: udp
+          group: any
+
+        # Allow TCP port 22 from any host
+        - port: 22
+          proto: tcp
+          groups:
+              - k8s
+              - swarm

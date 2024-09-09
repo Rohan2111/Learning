@@ -1,0 +1,135 @@
+### Node
+---
+
+pki:
+  ca: |
+    -----BEGIN NEBULA CERTIFICATE-----
+    CkMKEXNwLW5lYnVsYS1uZXR3b3JrKPbIjbUGMPavksQGOiAszmGfN2xMq7abIpgu
+    0oQFmFhFdF3cZ3LkdlmhVBaym0ABEkD0EI7kHrjMysjI0Rgn7EE0Nk0KyZiVC+pX
+    r3q7xmLrXupoWoum0ZJXbHTuzgCT2uqvFreDsrYZWSOuuzX1x9QG
+    -----END NEBULA CERTIFICATE-----
+  cert: |
+    -----BEGIN NEBULA CERTIFICATE-----
+    CmkKBXdyay0yEgn+g6hQgPj//w8iBXVzZXJzKIDqnbUGMPWvksQGOiBVqfGsGPI+
+    OByhiA6TNI+ftVQlHlPhQGlTk8h92MeDCUogaAyTUum0fYIDlZ9AhwQ8EbWfuV/H
+    u/pwSZxPNz77ExoSQIOq4grZ0hjq5Sm+UOUhhOqrA7Wth0S8zlUjVsfFvPE7LMOJ
+    aW07ioUEx2nLykOQJFV+slXPKtbhVPV8PCVW8AI=
+    -----END NEBULA CERTIFICATE-----
+  key: |
+    -----BEGIN NEBULA X25519 PRIVATE KEY-----
+    BLY7ES3vX31eDgemCPwrAB2YiRq3U5EpVYmWnva/hww=
+    -----END NEBULA X25519 PRIVATE KEY-----
+
+static_host_map:
+  "10.10.0.1": ["13.234.250.65:4242"]
+  "10.10.0.2": ["165.22.219.65:4242"]
+
+lighthouse:
+  am_lighthouse: false
+  interval: 60
+  hosts:
+    - "10.10.0.1"
+    - "10.10.0.2"
+
+remote_allow_list:
+  - "10.10.0.0/22"
+  - "10.10.1.0/22"
+  - "10.10.2.0/22"
+  - "10.10.3.0/22"
+
+local_allow_list:
+  "10.10.0.0/22": true
+
+listen:
+  host: '[::]'
+  port: 0
+
+static_map:
+  network: ip4
+
+relay:
+  relays:
+    - 10.10.0.1
+    - 10.10.0.2
+  am_relay: false
+  use_relays: true
+
+punchy:
+  punch: true
+  punch_back: true
+  respond: true
+  delay: 1s
+  respond_delay: 5s
+
+# Configure the private interface. Note: addr is baked into the nebula certificate
+tun:
+  # When tun is disabled, a lighthouse can be started without a local tun interface (and therefore without root)
+  disabled: false
+  # Name of the device. If not set, a default will be chosen by the OS
+  dev: nebula-net
+  # Toggles forwarding of local broadcast packets, the address of which depends on the ip/mask encoded in pki.cert
+  drop_local_broadcast: false
+  # Toggles forwarding of multicast packets
+  drop_multicast: false
+  # Sets the transmit queue length, if you notice lots of transmit drops on the tun it may help to raise this number. Default is 500
+  tx_queue: 500
+  # Default MTU for every packet, safe setting is (and the default) 1300 for internet based traffic
+  mtu: 1300
+
+# Configure logging level
+logging:
+  # panic, fatal, error, warning, info, or debug. Default is info
+  level: info
+  # json or text formats currently available. Default is text
+  format: json
+  # Disable timestamp logging. useful when output is redirected to a logging system that already adds timestamps. Default is false
+  # disable_timestamp: true
+  # timestamp format is specified in Go time format, see:
+  #     https://golang.org/pkg/time/#pkg-constants
+  # default when `format: json`: "2006-01-02T15:04:05Z07:00" (RFC3339)
+  # default when `format: text`:
+  #     when TTY attached: seconds since beginning of execution
+  #     otherwise: "2006-01-02T15:04:05Z07:00" (RFC3339)
+  # As an example, to log as RFC3339 with millisecond precision, set to:
+  # timestamp_format: "2006-01-02T15:04:05.000Z07:00"
+
+# stats:
+  # type: graphite
+  # prefix: nebula
+  # protocol: tcp
+  # host: 127.0.0.1:9999
+  # interval: 10s
+
+  type: prometheus
+  listen: 127.0.0.1:8080
+  path: /metrics
+  namespace: prometheusns
+  subsystem: nebula
+  interval: 10s
+
+
+# Firewall settings
+firewall:
+  # Action to take when a packet is not allowed by the firewall rules
+  #   `drop` (default): silently drop the packet.
+  #   `reject`: send a reject reply.
+    outbound_action: drop
+    inbound_action: drop
+
+    conntrack:
+      tcp_timeout: 12m
+      udp_timeout: 3m
+      default_timeout: 10m
+
+    outbound:
+    # Allow all outbound traffic from this node
+    - port: any
+      proto: any
+      host: any
+
+    inbound:
+    # Allow icmp (Ping) between any nebula hosts
+    - port: any
+      proto: any
+      groups: any
+

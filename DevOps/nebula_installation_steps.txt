@@ -1,0 +1,54 @@
+# Nebula Steps
+
+# Download Nebula tar file
+wget https://github.com/slackhq/nebula/releases/download/v1.9.3/nebula-linux-amd64.tar.gz
+
+# Extract tar file and copy binary file into /usr/local/bin folder
+sudo tar -xvzf nebula-linux-amd64.tar.gz -C /usr/local/bin
+
+# Create nebula folder in /etc directory and move to /etc/nebula folder
+sudo mkdir /etc/nebula && cd /etc/nebula
+
+# Create config.yml file for nebula
+sudo touch config.yml
+
+# Create a certificate for your node on the lighthouse server (this command creates two files: rohan.crt and rohan.key)
+nebula-cert sign -name "rohan" -ip "10.10.2.51/22" -groups "servers"
+
+# Copy the contents of rohan.crt and rohan.key into your node's config.yml
+# Restart the Nebula service to ensure everything is running fine
+
+# Configure Nebula service with systemctl
+sudo nano /etc/systemd/system/nebula.service
+
+# Add the following configuration to the nebula.service file
+[Unit]
+Description=Nebula overlay networking tool
+Wants=basic.target network-online.target nss-lookup.target time-sync.target
+After=basic.target network.target network-online.target
+Before=sshd.service
+
+[Service]
+SyslogIdentifier=nebula
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/nebula -config /etc/nebula/config.yml
+Restart=always
+StandardOutput=file:/var/log/nebula.log
+StandardError=file:/var/log/nebula.log
+
+[Install]
+WantedBy=multi-user.target
+
+# Reload systemd manager configuration and enable Nebula service to start on boot
+sudo systemctl daemon-reload && sudo systemctl enable --now nebula
+
+# Nebula commands
+
+# Follow the Nebula service logs
+journalctl --unit=nebula -f
+
+# Print the contents of the rohan.crt certificate
+nebula-cert print -path rohan.crt
+
+# Perform a DNS lookup against the lighthouse IP for a hostname
+dig @lighthouse-IP +short hostname
