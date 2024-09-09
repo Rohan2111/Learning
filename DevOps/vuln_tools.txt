@@ -1,0 +1,21 @@
+###### Blogs Links ######
+https://www.prplbx.com/resources/blog/docker-part2/
+
+
+###### Dive Tool ######
+$ wget https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
+$ sudo apt install ./dive_0.9.2_linux_amd64.deb
+$ dive <docker_image_name_with_tag>
+
+###### InSpec Tool ######
+$ sudo apt-get -y install ruby ruby-dev gcc g++ make
+$ sudo gem install inspec
+$ inspec exec https://github.com/dev-sec/linux-baseline -t docker://<docker_id>
+
+####### Trivy Tool ######
+$ sudo apt-get install wget apt-transport-https gnupg lsb-release
+$ wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+$ sudo echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+$ sudo apt-get update
+$ sudo apt-get install trivy
+$ sudo trivy image [YOUR_IMAGE_NAME]
