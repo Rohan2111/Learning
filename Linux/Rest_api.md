@@ -68,6 +68,7 @@
 ## REST API Request-Response Cycle
 - To understand the components of a REST API request and response, let's break it down with examples for `Operations`, `Headers`, `Endpoint`, `Parameters/Body`, and the Response in `JSON` format.
 
+<br>
 
 ### Operations (HTTP Methods)
 ---
