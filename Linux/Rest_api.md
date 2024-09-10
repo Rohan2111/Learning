@@ -1,6 +1,8 @@
 # What is REST API?
 - A **REST API** (**Representational State Transfer Application Programming Interface**) is a set of rules that allows systems to communicate over HTTP, following a stateless, client-server architecture. REST APIs are widely used for building web services that allow different applications to exchange data.
 
+<br>
+
 ## Key Concepts
 ### **Resource:**
 ---
@@ -66,7 +68,6 @@
 ## REST API Request-Response Cycle
 - To understand the components of a REST API request and response, let's break it down with examples for `Operations`, `Headers`, `Endpoint`, `Parameters/Body`, and the Response in `JSON` format.
 
-<br>
 
 ### Operations (HTTP Methods)
 ---
