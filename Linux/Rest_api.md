@@ -1,14 +1,15 @@
 # What is REST API?
 - A **REST API** (**Representational State Transfer Application Programming Interface**) is a set of rules that allows systems to communicate over HTTP, following a stateless, client-server architecture. REST APIs are widely used for building web services that allow different applications to exchange data.
-<br>
 
 ## Key Concepts
-1. **Resource:**
+### **Resource:**
+---
 - REST uses resources, which are typically entities like users, posts, or products, and these resources are represented using `URIs` (**Uniform Resource Identifiers**). For example, a user resource might be accessible at `/users/123`.
 
 <br>
 
-2. **HTTP Methods**
+### **HTTP Methods**
+---
 - REST APIs use standard HTTP methods to perform actions on resources:
   - `GET` - Read (Retrieve a resource)
   - `POST` - Create (Create a new resource)
@@ -18,24 +19,28 @@
 
 <br>
 
-3. **Statelessness:**
+### **Statelessness:**
+---
 - Each request from a client to a server must contain all the information needed to understand and process the request. The server does not store the client's state.
 
 <br>
 
-4. **Representation:**
+### **Representation:**
+---
 - Resources are returned to the client in formats like `JSON` (commonly used) or `XML`, allowing the client to interpret the data.
 
 <br>
 
-5. **URL Structure:**
+### **URL Structure:**
+---
 - RESTful APIs follow a predictable, hierarchical URL structure:
   - Example: `https://api.example.com/users/123/posts/456`
   - Represents the posts of a specific user, with both the user ID and post ID in the URL.
 
 <br>
 
-6. **Stateless Operations:**
+### **Stateless Operations:**
+---
 - Each request is independent; the server doesn’t maintain any client session between calls, ensuring scalability.
 
 <br>
